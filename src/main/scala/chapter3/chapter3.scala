@@ -72,5 +72,13 @@ package chapter3 {
         case Cons(x, xs) => foldLeft(xs, f(z, x))(f)
       }
     }
+
+    def reverse[A](l: List[A]): List[A] = {
+      foldLeft(l, Nil: List[A])((b, a) => Cons(a, b))
+    }
+
+    def append[A](as: List[A], bs: List[A]): List[A] = {
+      foldRight(as, bs)((a, bs) => (Cons(a, bs)))
+    }
   }
 }
