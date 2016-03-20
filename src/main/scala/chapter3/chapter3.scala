@@ -80,5 +80,62 @@ package chapter3 {
     def append[A](as: List[A], bs: List[A]): List[A] = {
       foldRight(as, bs)((a, bs) => (Cons(a, bs)))
     }
+
+    def addOne(as: List[Int]): List[Int] = {
+      as match {
+        case Nil => Nil
+        case Cons(a, as) => Cons(a + 1, addOne(as))
+      }
+    }
+
+    def doubleToString(as: List[Double]): List[String] = {
+      as match {
+        case Nil => Nil
+        case Cons(a, as) => Cons(a.toString(), doubleToString(as))
+      }
+    }
+
+    def map[A, B](as: List[A])(f: A => B): List[B] = {
+      as match {
+        case Nil => Nil
+        case Cons(a, as) => Cons(f(a), map(as)(f))
+      }
+    }
+
+    def filter[A](as: List[A])(f: A => Boolean): List[A] = {
+      as match {
+        case Nil => Nil
+        case Cons(a, as) if f(a) => Cons(a, filter(as)(f))
+      }
+    }
+
+    def flatMap[A, B](as: List[A])(f: A => List[B]): List[B] = {
+      val nested = map(as)(f)
+      foldRight(nested, Nil: List[B])((a, b) => append(a, b))
+    }
+
+    def filterViaFlatMap[A, B](as: List[A])(f: A => Boolean): List[A] = {
+      flatMap(as)(a => if (f(a)) List(a) else Nil)
+    }
+
+    def zipAdd(as: List[Int], bs: List[Int]): List[Int] = {
+      as match {
+        case Nil => Nil
+        case Cons(a, as) => bs match {
+          case Nil => Nil
+          case Cons(b, bs) => Cons(a + b, zipAdd(as, bs))
+        }
+      }
+    }
+
+    def zipWith[A, B, C](as: List[A], bs: List[B])(f: (A, B) => C): List[C] = {
+      as match {
+        case Nil => Nil
+        case Cons(a, as) => bs match {
+          case Nil => Nil
+          case Cons(b, bs) => Cons(f(a, b), zipWith(as, bs)(f))
+        }
+      }
+    }
   }
 }
