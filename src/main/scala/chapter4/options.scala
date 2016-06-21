@@ -36,7 +36,31 @@ case class Some[A](a: A) extends Option[A]
 case object None extends Option[Nothing]
 
 object Option {
+  def mean(xs: Seq[Double]): Option[Double] = {
+    if (xs.isEmpty) None
+    Some(xs.sum / xs.length)
+  }
+
   def variance(xs: Seq[Double]): Option[Double] = {
-    None
+    mean(xs).flatMap(m => mean(xs.map(x => math.pow(x - m, 2))))
+  }
+
+  def map2[A, B, C](a: Option[A], b: Option[B])(f: (A, B) => C): Option[C] = {
+    a.flatMap(a => b.map(b => f(a, b)))
+  }
+
+  def sequence[A](a: List[Option[A]]): Option[List[A]] = {
+    a.foldRight[Option[List[A]]](Some(Nil))((opt, b) => map2(opt, b)(_ :: _))
+  }
+
+  def traverse[A, B](as: List[A])(f: A => Option[B]): Option[List[B]] = {
+    as match {
+      case Nil => Some(Nil)
+      case h::tail => map2(f(h), traverse(tail)(f))(_ :: _)
+    }
+  }
+
+  def traverse_fold[A, B](as: List[A])(f: A => Option[B]): Option[List[B]] = {
+    as.foldRight[Option[List[B]]](Some(Nil))((h, t) => (map2(f(h), t)(_ :: _)))
   }
 }
